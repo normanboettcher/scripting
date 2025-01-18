@@ -7,6 +7,7 @@ ENABLE_PUSH_DEFAULT=true
 ENABLE_PMD_DEFAULT=true
 ENABLE_PMD=false
 ENABLE_PUSH=false
+VERSION="1.0.0"
 
 function is_git_on_path() {
     command -v git >/dev/null 2>&1
@@ -24,9 +25,32 @@ function pmd_plugin_found() {
     mvn help:effective-pom | grep maven-pmd-plugin >/dev/null 2>&1
 }
 
+function print_help() {
+    cat << EOF
+Verwendung: $(basename "$0") [Optionen]
+
+Beschreibung:
+    Dieses Skript führt [Kurze Beschreibung der Funktion des Skripts] aus.
+
+Optionen:
+    -h, --help              Prints help for usage of parameters and script 
+    -v, --version           Prints version number of the script.
+    -e, --enable            Responsible for pushing to remote repository. 
+                            True, if flag is provided to script
+    -p, --pmd               If you pass the flag to the script, 
+                            you enable the pmd check for your Java/Maven project 
+
+Examples:
+    $(basename "$0") --enable 
+    $(basename "$0") --enable --pmd
+    $(basename "$0") -ep
+
+EOF
+}
+
 function check_flags() {
     #Parse options, the script supports short and long flags
-    local OPTS=$(getopt -o "ehp" -l "enable,help,pmd" -- "$@")
+    local OPTS=$(getopt -o "ehpv" -l "enable,help,pmd, version" -- "$@")
     if [ $? != 0 ]; then
         echo "Failed to parse options."
         exit 1
@@ -45,8 +69,12 @@ function check_flags() {
             shift
             ;;
         -h | --help)
-            echo "Print help"
+            print_help
             exit 0
+            ;;
+        -v | --version)
+            echo "You are using github_push.sh with version: $VERSION"
+            shift
             ;;
         --)
             shift
