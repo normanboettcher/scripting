@@ -159,6 +159,3 @@ if [ $ENABLE_PUSH = "true" ]; then
         exit 1
     fi
 fi
-
-#Print Success-Message
-exit 0
