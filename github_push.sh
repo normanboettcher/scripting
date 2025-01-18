@@ -125,11 +125,12 @@ git commit -m "$commit_message"
 #If Push enabled (--enable=false, default)
 if [ $ENABLE_PUSH ]; then
     SUCCESS=$(git push origin $CURRENT_BRANCH)
+    echo "SCUESS: $SUCCESS"
     if [ $SUCCESS -eq 0 ]; then
         echo "Pushed $CURRENT_BRANCH successfully"
         exit 0
     else
-        echo "Der Push nach origin/$CURRENT_BRANCH"
+        echo "Push to origin/$CURRENT_BRANCH failed"
     fi
 fi
 
