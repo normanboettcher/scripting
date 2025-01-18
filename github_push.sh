@@ -3,11 +3,9 @@
 #The following script is designed to automate the process of a GitHub push operation,
 #including highly customizable steps to ensure quality checks before pushing your code to remote repository.
 
-ENABLE_PUSH_DEFAULT=true
-ENABLE_PMD_DEFAULT=true
-ENABLE_PMD=false
-ENABLE_PUSH=false
-VERSION="1.0.0"
+ENABLE_PMD="false"
+ENABLE_PUSH="false"
+VERSION="1.0.1"
 
 function is_git_on_path() {
     command -v git >/dev/null 2>&1
@@ -61,11 +59,11 @@ function check_flags() {
     while true; do
         case "$1" in
         -e | --enable)
-            ENABLE_PUSH=true
+            ENABLE_PUSH="true"
             shift
             ;;
         -p | --pmd)
-            ENABLE_PMD=true
+            ENABLE_PMD="true"
             shift
             ;;
         -h | --help)
@@ -119,13 +117,13 @@ fi
 
 #Check if pmd plugin exists
 ##If not successfull exit 1
-if [ $ENABLE_PMD ]; then
+if [ $ENABLE_PMD = "true" ]; then
     if [ ! pmd_plugin_found ]; then
         echo "You want to check your pmd before your push, but could not found pmd plugin"
         exit 1
     fi
     PMD_SUCCESS=$(mvn pmd:check)
-    if [ ! $PMD_SUCCESS -eq 0 ]; then
+    if [[ ! $PMD_SUCCESS -eq 0 ]]; then
         echo "PMD-Check failed. Please fix your findings before pushing to remote repository."
         exit 1
     fi
@@ -151,7 +149,7 @@ git commit -m "$commit_message"
 
 #Check flags
 #If Push enabled (--enable=false, default)
-if [ $ENABLE_PUSH ]; then
+if [ $ENABLE_PUSH = "true" ]; then
     git push origin $CURRENT_BRANCH
     if [[ $? -eq 0 ]]; then
         echo "Pushed $CURRENT_BRANCH successfully"
