@@ -9,19 +9,19 @@ ENABLE_PMD=false
 ENABLE_PUSH=false
 
 function is_git_on_path() {
-    command -v git > /dev/null 2>&1
+    command -v git >/dev/null 2>&1
 }
 
 function is_git_repo() {
-    git rev-parse --is-inside-work-tree > /dev/null 2>&1
+    git rev-parse --is-inside-work-tree >/dev/null 2>&1
 }
 
 function is_mvn_on_path() {
-    command -v mvn > /dev/null 2>&1
+    command -v mvn >/dev/null 2>&1
 }
 
 function pmd_plugin_found() {
-    mvn help:effective-pom | grep maven-pmd-plugin > /dev/null 2>&1
+    mvn help:effective-pom | grep maven-pmd-plugin >/dev/null 2>&1
 }
 
 function check_flags() {
@@ -35,35 +35,35 @@ function check_flags() {
     eval set -- "$OPTS" #Set positional parameter
 
     while true; do
-        case "$1" in 
-            -e|--enable)
-                ENABLE_PUSH=true
-                shift 
-                ;;
-            -p|--pmd)
-                ENABLE_PMD=true
-                shift 
-                ;;
-            -h|--help)
-                echo "Print help"
-                exit 0
-                ;;
-            --)
-                shift
-                break
-                ;;
-            *)
-                echo "Unknown Option: $1"
-                exit 1
-                ;;
+        case "$1" in
+        -e | --enable)
+            ENABLE_PUSH=true
+            shift
+            ;;
+        -p | --pmd)
+            ENABLE_PMD=true
+            shift
+            ;;
+        -h | --help)
+            echo "Print help"
+            exit 0
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Unknown Option: $1"
+            exit 1
+            ;;
         esac
     done
-    
+
 }
 
 #Check, if current directory is git repository and if git command is found on path
 ##If not successfull exit 1
-if ! is_git_on_path; then 
+if ! is_git_on_path; then
     echo "It looks like your git installation is not available on your PATH"
     echo "Please configure git first"
     exit 1
@@ -74,7 +74,6 @@ if ! is_git_repo; then
     echo "Please clone or create a git repository first"
     exit 1
 fi
-
 
 #Check flags
 ##--enabled, -e (is your commit supposed to be pushed to remote repository)
@@ -92,13 +91,13 @@ fi
 
 #Check if pmd plugin exists
 ##If not successfull exit 1
-if [ ENABLE_PMD ]; then
+if [ $ENABLE_PMD ]; then
     if [ ! pmd_plugin_found ]; then
         echo "You want to check your pmd before your push, but could not found pmd plugin"
         exit 1
     fi
     PMD_SUCCESS=$(mvn pmd:check)
-    if [ PMD_SUCCESS -neq 0 ]; then
+    if [ ! $PMD_SUCCESS -eq 0 ]; then
         echo "PMD-Check failed. Please fix your findings before pushing to remote repository."
         exit 1
     fi
@@ -108,30 +107,31 @@ fi
 echo "Please check your current status you want to push:"
 git status
 
-#Perform git add .  
+#Perform git add .
 git add .
 #Extract current Branch Name
 #If Branch Name is part of Jira-Issue
 ##Then save branch name in variable
 CURRENT_BRANCH=$(git branch --show-current)
-if [ grep '/' <<< "$CURRENT_BRANCH" ]; then
-    awk '{ 
-        n = split($0, parts)
-        for (k=1; k <= n; k++)
-            print("parts[" k "] = \"" parts[k] "\"")
-     }' <<< "$CURRENT_BRANCH"
-else
-    JIRA=$(grep -oE '[A-Z]+-[0-9]+' <<< "$CURRENT_BRANCH") 
-    echo "gefundenes Jira: $JIRA"
-fi
-#Ask for Commit Message
 
+JIRA=$(grep -oE '[A-Z]+-[0-9]+' <<<"$CURRENT_BRANCH")
+#Ask for Commit Message
+echo "Please provide your commit message (if jira-issue found, the corresponding issue will be used as prefix):"
+read commit_message
 #Perform git commit -m with given message (and maybe Jira-Issue)
+git commit -m "$commit_message"
 
 #Check flags
-
-#If Push enabled (--enable=true, default)
-##Perform git push
+#If Push enabled (--enable=false, default)
+if [ $ENABLE_PUSH ]; then
+    SUCCESS=$(git push origin $CURRENT_BRANCH)
+    if [ $SUCCESS -eq 0 ]; then
+        echo "Pushed $CURRENT_BRANCH successfully"
+        exit 0
+    else
+        echo "Der Push nach origin/$CURRENT_BRANCH"
+    fi
+fi
 
 #Print Success-Message
 exit 0
