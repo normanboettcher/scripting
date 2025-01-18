@@ -5,7 +5,7 @@
 
 ENABLE_PMD="false"
 ENABLE_PUSH="false"
-VERSION="1.0.1"
+VERSION="1.0.2"
 
 function is_git_on_path() {
     command -v git >/dev/null 2>&1
