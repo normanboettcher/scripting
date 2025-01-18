@@ -74,7 +74,7 @@ function check_flags() {
             ;;
         -v | --version)
             echo "You are using github_push.sh with version: $VERSION"
-            shift
+            exit 0
             ;;
         --)
             shift
