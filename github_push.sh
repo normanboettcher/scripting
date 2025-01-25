@@ -8,7 +8,7 @@ trap 'handle_error "$CURRENT_STEP"' ERR
 
 ENABLE_PMD="false"
 ENABLE_PUSH="false"
-VERSION="1.1.0"
+VERSION="1.1.1"
 CURRENT_STEP=""
 
 function handle_error() {
@@ -133,6 +133,7 @@ is_mvn_on_path
 if [ "$ENABLE_PMD" = "true" ]; then
     #If not found, programm will exit 
     pmd_plugin_found
+    echo "Running PMD-Check..."
     TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
     LOG_FILE="pmd_log_$TIMESTAMP.txt"
     mvn pmd:check > "$LOG_FILE" 2>&1
@@ -176,7 +177,6 @@ if [[ "$commit_message" =~ '[^a-zA-Z0-9[:space:]_\-.,;:?!()]' ]]; then
     exit 1
 fi
 
-commit_message=$(printf "%q" "$commit_message")
 CURRENT_STEP="Check if current branch name has corresponding Jira"
 JIRA=$(grep -oE '[A-Z]+-[0-9]+' <<<"$CURRENT_BRANCH" || echo "")
 #Perform git commit -m with given message (and maybe Jira-Issue)
