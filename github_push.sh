@@ -8,7 +8,7 @@ trap 'handle_error "$CURRENT_STEP"' ERR
 
 ENABLE_PMD="false"
 ENABLE_PUSH="false"
-VERSION="1.1.0"
+VERSION="1.1.1"
 CURRENT_STEP=""
 
 function handle_error() {
