@@ -176,7 +176,6 @@ if [[ "$commit_message" =~ '[^a-zA-Z0-9[:space:]_\-.,;:?!()]' ]]; then
     exit 1
 fi
 
-commit_message=$(printf "%q" "$commit_message")
 CURRENT_STEP="Check if current branch name has corresponding Jira"
 JIRA=$(grep -oE '[A-Z]+-[0-9]+' <<<"$CURRENT_BRANCH" || echo "")
 #Perform git commit -m with given message (and maybe Jira-Issue)
