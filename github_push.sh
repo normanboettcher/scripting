@@ -133,6 +133,7 @@ is_mvn_on_path
 if [ "$ENABLE_PMD" = "true" ]; then
     #If not found, programm will exit 
     pmd_plugin_found
+    echo "Running PMD-Check..."
     TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
     LOG_FILE="pmd_log_$TIMESTAMP.txt"
     mvn pmd:check > "$LOG_FILE" 2>&1
